@@ -74,9 +74,8 @@ class Board:
         """
         input = stdin.readlines()
         inp = ""
-        for line in input[1:]:
+        for line in input:
             inp += ''.join(line.split())
-        print(inp)
         size = int(inp[0])
         
         board = numpy.empty((size, size), dtype=int)
@@ -85,7 +84,6 @@ class Board:
             for j in range(i *size + 1, i * size + size + 1):
                 line.append(int(inp[j]))
             board[i] = numpy.array(line)
-        print(board)
         return Board(board)
 
     # TODO: outros metodos da classe
