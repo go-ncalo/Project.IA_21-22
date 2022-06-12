@@ -6,7 +6,13 @@
 # 00000 Nome1
 # 00000 Nome2
 
+from hashlib import new
 import sys
+from sys import stdin
+import numpy
+
+from pexpect import EOF
+from tomlkit import string
 from search import (
     Problem,
     Node,
@@ -33,7 +39,10 @@ class TakuzuState:
 
 
 class Board:
-    """Representação interna de um tabuleiro de Takuzu."""
+    def __init__(self, board):
+        """Representação interna de um tabuleiro de Takuzu."""
+        self.board = board
+        pass
 
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
@@ -63,8 +72,21 @@ class Board:
             > from sys import stdin
             > stdin.readline()
         """
-        # TODO
-        pass
+        input = stdin.readlines()
+        inp = ""
+        for line in input[1:]:
+            inp += ''.join(line.split())
+        print(inp)
+        size = int(inp[0])
+        
+        board = numpy.empty((size, size), dtype=int)
+        for i in range(size):
+            line = []
+            for j in range(i *size + 1, i * size + size + 1):
+                line.append(int(inp[j]))
+            board[i] = numpy.array(line)
+        print(board)
+        return Board(board)
 
     # TODO: outros metodos da classe
 
@@ -106,7 +128,8 @@ class Takuzu(Problem):
 
 if __name__ == "__main__":
     # TODO:
-    # Ler o ficheiro de input de sys.argv[1],
+    Board.parse_instance_from_stdin()
+    # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
