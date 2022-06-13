@@ -2,17 +2,14 @@
 # Devem alterar as classes e funções neste ficheiro de acordo com as instruções do enunciado.
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
-# Grupo 00:
-# 00000 Nome1
-# 00000 Nome2
+# Grupo 66:
+# 99189 Carolina Fonseca Coelho
+# 99225 Gonçalo Botelho Mateus
 
-from hashlib import new
 import sys
 from sys import stdin
-import numpy
+import numpy as np
 
-from pexpect import EOF
-from tomlkit import string
 from search import (
     Problem,
     Node,
@@ -39,27 +36,35 @@ class TakuzuState:
 
 
 class Board:
-    def __init__(self, board):
+    def __init__(self, board, size):
         """Representação interna de um tabuleiro de Takuzu."""
         self.board = board
+        self.size = size
         pass
 
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        # TODO
-        pass
+        return self.board[row, col]
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        # TODO
-        pass
+        if (row == 0):
+            return (self.board[row + 1][col], None)
+        elif (row == self.size - 1):
+            return (None, self.board[row - 1][col])
+        else:
+            return (self.board[row + 1][col], self.board[row - 1][col])
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        # TODO
-        pass
+        if (col == 0):
+            return (None, self.board[row][col + 1])
+        elif (col == self.size - 1):
+            return (self.board[row][col - 1], None)
+        else:
+            return (self.board[row][col - 1], self.board[row][col + 1])
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -78,13 +83,14 @@ class Board:
             inp += ''.join(line.split())
         size = int(inp[0])
         
-        board = numpy.empty((size, size), dtype=int)
+        board = np.empty((size, size), dtype=int)
         for i in range(size):
             line = []
             for j in range(i *size + 1, i * size + size + 1):
                 line.append(int(inp[j]))
-            board[i] = numpy.array(line)
-        return Board(board)
+            board[i] = np.array(line)
+        print(board)
+        return Board(board, size)
 
     # TODO: outros metodos da classe
 
@@ -126,7 +132,11 @@ class Takuzu(Problem):
 
 if __name__ == "__main__":
     # TODO:
-    Board.parse_instance_from_stdin()
+    board = Board.parse_instance_from_stdin()
+    print(board.adjacent_vertical_numbers(3, 3))
+    print(board.adjacent_horizontal_numbers(3, 3))
+    print(board.adjacent_vertical_numbers(1, 1))
+    print(board.adjacent_horizontal_numbers(1, 1))
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
