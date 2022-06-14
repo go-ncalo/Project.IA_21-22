@@ -44,27 +44,21 @@ class Board:
 
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        return self.board[row, col]
+        try:
+            return self.board[row, col]
+        except IndexError:
+            return None
+
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        if (row == 0):
-            return (self.board[row + 1][col], None)
-        elif (row == self.size - 1):
-            return (None, self.board[row - 1][col])
-        else:
-            return (self.board[row + 1][col], self.board[row - 1][col])
+        return (self.get_number(row + 1, col), self.get_number(row - 1, col))
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        if (col == 0):
-            return (None, self.board[row][col + 1])
-        elif (col == self.size - 1):
-            return (self.board[row][col - 1], None)
-        else:
-            return (self.board[row][col - 1], self.board[row][col + 1])
+        return (self.get_number(row, col - 1), self.get_number(row, col + 1))
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -77,19 +71,8 @@ class Board:
             > from sys import stdin
             > stdin.readline()
         """
-        input = stdin.readlines()
-        inp = ""
-        for line in input:
-            inp += ''.join(line.split())
-        size = int(inp[0])
-        
-        board = np.empty((size, size), dtype=int)
-        for i in range(size):
-            line = []
-            for j in range(i *size + 1, i * size + size + 1):
-                line.append(int(inp[j]))
-            board[i] = np.array(line)
-        print(board)
+        size = stdin.readline()
+        board = np.loadtxt(stdin, dtype=int)
         return Board(board, size)
 
     # TODO: outros metodos da classe
