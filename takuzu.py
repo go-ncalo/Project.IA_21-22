@@ -144,8 +144,8 @@ class Board:
             row=Board.get_row(i)
             z=0
             s=self.size
-            if (self.size%2==1):
-            z=1
+            if (s%2==1):
+                z=1
             card_row=Board.get_card_row(i)
             card_col=Board.get_card_col(i)
             if (card_row[0]==s//2+z):
