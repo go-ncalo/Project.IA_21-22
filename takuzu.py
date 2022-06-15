@@ -43,6 +43,20 @@ class Board:
         self.board = board
         self.size = size
         pass
+    
+    # FUNÇÃO DO GONÇALO
+    def copy(self):
+        side = board.size
+        
+        b = Board(np.zeros(shape=(side, side), dtype=int), side)
+        
+        
+        for row in range(board.size):
+            for col in range(board.size):
+                b.change_value(row, col, int(self.get_number(row, col)))
+        
+        
+        return b
 
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
@@ -132,54 +146,46 @@ class Board:
 
         for i in range(0,self.size):
             for j in range(0,self.size):
-                if self.board.get_number(i,j)==2:
+                if self.get_number(i,j)==2:
                     return False
 
         return True 
     
-
-
-
-
-
     def get_action(self):
 
         for i in range(0,self.size) :
             for j in range (0,self.size):
-                if (Board.adjacent_vertical_numbers(i,j)==(0,0)):
+                if (self.adjacent_vertical_numbers(i,j)==(0,0)):
                     return (i,j,1)
-                elif (Board.adjacent_horizontal_numbers(i,j)==(1,1)):
+                elif (self.adjacent_horizontal_numbers(i,j)==(1,1)):
                     return (i,j,0)
 
         for i in range (0, self.size):
-            col=Board.get_col(i)
-            row=Board.get_row(i)
+            col=self.get_col(i)
+            row=self.get_row(i)
             z=0
             s=self.size
             if (s%2==1):
                 z=1
-            card_row=Board.get_card_row(i)
-            card_col=Board.get_card_col(i)
+            card_row=self.get_card_vector(i,ROW)
+            card_col=self.get_card_vector(i,COL)
             if (card_row[0]==s//2+z):
-                j=Board.first_void_position(i,ROW)
+                j=self.first_void_position(i,ROW)
                 return(i,j,1)
             if card_row[1]==s//2+z:
-                j=Board.first_void_position(i,ROW)
+                j=self.first_void_position(i,ROW)
                 return(i,j,0)
             if card_col[0]==s//2+z:
-                j=Board.first_void_position(i,COL)
+                j=self.first_void_position(i,COL)
                 return(j,i,1)
             if card_col[1]==s//2+z:
-                j=Board.first_void_position(i,COL)
+                j=self.first_void_position(i,COL)
                 return(j,i,0)
 
             for i in range(0,self.size):
                 j=self.first_void_position(i)
                 if j!=None:
                     return [(i,j,0),(i,j,1)]
-
-
-    
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -194,7 +200,21 @@ class Board:
         """
         size = stdin.readline()
         board = np.loadtxt(stdin, dtype=int)
-        return Board(board, size)
+        return Board(board, int(size))
+
+    # FUNÇÃO DO GONÇALO
+    def __str__(self):
+        out = ""
+
+        for row in range(self.size):
+            for col in range(self.size):
+                out += str(self.get_number(row, col))
+                if col < (self.size - 1):
+                    out += '\t'
+
+            if (row != (self.size - 1)):
+                out += '\n'
+        return out
 
     # TODO: outros metodos da classe
 
@@ -202,13 +222,13 @@ class Board:
 class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
-        self.state=TakuzuState(board)
+        self.initial=TakuzuState(board)
 
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        return [self.state.board.get_action()]
-        
+        return [state.board.get_action()]
+
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
         'state' passado como argumento. A ação a executar deve ser uma
@@ -216,8 +236,8 @@ class Takuzu(Problem):
         self.actions(state)."""
         i=action[0]
         j=action[1]
-        value=action[3]
-        board_copy = np.ndarray.__deepcopy__(self.state.board)
+        value=action[2]
+        board_copy = state.board.copy()
         new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
         return new_state
@@ -226,16 +246,16 @@ class Takuzu(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
-        if self.state.board.all_positions_filled()==False:
+        if state.board.all_positions_filled()==False:
             return False
         
-        for i in range(0,self.state.board.size):
-            for j in range(0,self.state.board.size):
-                value=self.state.board.get_number(i,j)
-                (v1,v2)=self.state.board.adjacent_horizontal_numbers(i,j)
+        for i in range(0,state.board.size):
+            for j in range(0,state.board.size):
+                value=state.board.get_number(i,j)
+                (v1,v2)=state.board.adjacent_horizontal_numbers(i,j)
                 if v1==value and v2==value:
                     return False
-                (v1,v2)=self.state.board.adjacent_vertical_numbers(i,j)
+                (v1,v2)=state.board.adjacent_vertical_numbers(i,j)
                 if v1==value and v2==value:
                     return False
 
@@ -244,16 +264,16 @@ class Takuzu(Problem):
         if (s%2==1):
             z=1 
 
-        for i in range(0,self.state.board.size):
-            (n0,n1)=self.state.board.get_card_vector(i,ROW)
+        for i in range(0,state.board.size):
+            (n0,n1)=state.board.get_card_vector(i,ROW)
             if n0>s//2+z or n1>s//2+z:
                 return False
             
-        for i in range(0,self.state.board.size):
-            for j in range(i,self.state.board.size):
-                if self.state.board.different_cols(i,j):
+        for i in range(0,state.board.size):
+            for j in range(i,state.board.size):
+                if state.board.different_cols(i,j):
                     return False
-                if self.state.board.different_rows(i,j):
+                if state.board.different_rows(i,j):
                     return False
         
         return True
@@ -271,10 +291,9 @@ class Takuzu(Problem):
 if __name__ == "__main__":
     # TODO:
     board = Board.parse_instance_from_stdin()
-    print(board.adjacent_vertical_numbers(3, 3))
-    print(board.adjacent_horizontal_numbers(3, 3))
-    print(board.adjacent_vertical_numbers(1, 1))
-    print(board.adjacent_horizontal_numbers(1, 1))
+    problem = Takuzu(board)
+    goal_node = depth_first_tree_search(problem)
+    print(board)
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
