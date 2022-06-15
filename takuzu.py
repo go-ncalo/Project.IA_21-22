@@ -20,8 +20,8 @@ from search import (
     recursive_best_first_search,
 )
 
-ROW=0
-COL=1
+ROW = 0
+COL = 1
 
 class TakuzuState:
     state_id = 0
@@ -69,11 +69,11 @@ class Board:
 
     def get_row(self, row: int):
         """Devolve os valores da linha pretendida."""
-        return board[row, :]
+        return self.board[row, :]
 
     def get_col(self, col: int):
         """Devolve os valores da linha pretendida."""
-        return board[: ,col]
+        return self.board[: ,col]
 
     def get_card_row(self, index: int, type:int):
         counter_1=0
@@ -81,14 +81,14 @@ class Board:
 
         if (type==ROW):
             vector=self.get_row(index)
-        else if (type==COL):
+        elif (type==COL):
             vector=self.get_col(index)
             
-        for i in range(0, size):
+        for i in range(0, self.size):
             if (vector[i]==1):
-                counter_1++
-            else if (vecto[i]==0):
-                counter_0++
+                counter_1 += 1
+            elif (vector[i]==0):
+                counter_0 += 1
 
         return (counter_0,counter_1)
 
@@ -99,15 +99,15 @@ class Board:
             vector1=self.get_row(index1)
             vector2=self.get_row(index2)
 
-        else if (type==COL):
+        elif (type==COL):
             vector1=self.get_col(index1)
             vector2=self.get_col(index2)
             
-        for i in range(0, size):
+        for i in range(0, self.size):
             if (vector1[i]!=vector2[i]):
-                return true
+                return True
 
-        return false
+        return False
 
     def different_cols(self, col1:int, col2:int):
         return self.different_vectors(col1,col2,COL)
@@ -119,7 +119,7 @@ class Board:
         
         if (type==ROW):
             vector=self.get_row(index)
-        else if (type==COL):
+        elif (type==COL):
             vector=self.get_col(index)
 
         for i in range(0,self.size):
@@ -132,33 +132,33 @@ class Board:
 
     def get_action(self):
 
-        for i in range(1,size-1) :
-            for j in range (1,size-1):
-                if (adjacent_vertical_numbers(i,j)==(0,0))
+        for i in range(1,self.size-1) :
+            for j in range (1,self.size-1):
+                if (Board.adjacent_vertical_numbers(i,j)==(0,0)):
                     return (i,j,1)
-                else if (adjacent_horizontal_numbers(i,j)==(1,1))
+                elif (Board.adjacent_horizontal_numbers(i,j)==(1,1)):
                     return (i,j,0)
 
-        for i in range (0:size):
-            col=get_col(i)
-            row=get_row(i)
+        for i in range (0, self.size):
+            col=Board.get_col(i)
+            row=Board.get_row(i)
             z=0
             s=self.size
-            if (size%2==1):
+            if (self.size%2==1):
             z=1
-            card_row=get_card_row(i)
-            card_col=get_card_col(i)
+            card_row=Board.get_card_row(i)
+            card_col=Board.get_card_col(i)
             if (card_row[0]==s//2+z):
-                j=first_void_position(i,ROW)
+                j=Board.first_void_position(i,ROW)
                 return(i,j,1)
-            if (card_row([1]==s//2+z):
-                j=first_void_position(i,ROW)
+            if card_row[1]==s//2+z:
+                j=Board.first_void_position(i,ROW)
                 return(i,j,0)
-            if (card_col[0]==s//2+z):
-                j=first_void_position(i,COL)
+            if card_col[0]==s//2+z:
+                j=Board.first_void_position(i,COL)
                 return(j,i,1)
-            if (card_col[1]=s//2+z):
-                j=first_void_position(i,COL)
+            if card_col[1]==s//2+z:
+                j=Board.first_void_position(i,COL)
                 return(j,i,0)
 
 
@@ -200,7 +200,7 @@ class Takuzu(Problem):
         i=action[0]
         j=action[1]
         value=action[3]
-        //CRIAR CÓPIA DO BOARD
+        #CRIAR CÓPIA DO BOARD
         new_state=TakuzuState(self.state.board)
         new_state.board.change_value(i,j,value)
         return new_state
