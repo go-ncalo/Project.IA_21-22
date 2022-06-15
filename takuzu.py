@@ -128,7 +128,6 @@ class Board:
         
         return None
 
-    
 
     def get_action(self):
 
@@ -160,6 +159,11 @@ class Board:
             if card_col[1]==s//2+z:
                 j=Board.first_void_position(i,COL)
                 return(j,i,0)
+
+            for i in range(0,self.size):
+                j=self.first_void_position(i)
+                if j!=None:
+                    return [(i,j,0),(i,j,1)]
 
 
     
@@ -200,11 +204,10 @@ class Takuzu(Problem):
         i=action[0]
         j=action[1]
         value=action[3]
-        #CRIAR CÓPIA DO BOARD
-        new_state=TakuzuState(self.state.board)
+        board_copy = np.ndarray.__deepcopy__(self.state.board)
+        new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
         return new_state
-
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
