@@ -75,7 +75,7 @@ class Board:
         """Devolve os valores da linha pretendida."""
         return self.board[: ,col]
 
-    def get_card_row(self, index: int, type:int):
+    def get_card_vector(self, index: int, type:int):
         counter_1=0
         counter_0=0
 
@@ -128,11 +128,24 @@ class Board:
         
         return None
 
+    def all_positions_filled(self):
+
+        for i in range(0,self.size):
+            for j in range(0,self.size):
+                if self.board.get_number(i,j)==2:
+                    return False
+
+        return True 
+    
+
+
+
+
 
     def get_action(self):
 
-        for i in range(1,self.size-1) :
-            for j in range (1,self.size-1):
+        for i in range(0,self.size) :
+            for j in range (0,self.size):
                 if (Board.adjacent_vertical_numbers(i,j)==(0,0)):
                     return (i,j,1)
                 elif (Board.adjacent_horizontal_numbers(i,j)==(1,1)):
@@ -208,12 +221,44 @@ class Takuzu(Problem):
         new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
         return new_state
+        
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
-        # TODO
-        pass
+        if self.state.board.all_positions_filled()==False:
+            return False
+        
+        for i in range(0,self.state.board.size):
+            for j in range(0,self.state.board.size):
+                value=self.state.board.get_number(i,j)
+                (v1,v2)=self.state.board.adjacent_horizontal_numbers(i,j)
+                if v1==value and v2==value:
+                    return False
+                (v1,v2)=self.state.board.adjacent_vertical_numbers(i,j)
+                if v1==value and v2==value:
+                    return False
+
+        z=0
+        s=self.size
+        if (s%2==1):
+            z=1 
+
+        for i in range(0,self.state.board.size):
+            (n0,n1)=self.state.board.get_card_vector(i,ROW)
+            if n0>s//2+z or n1>s//2+z:
+                return False
+            
+        for i in range(0,self.state.board.size):
+            for j in range(i,self.state.board.size):
+                if self.state.board.different_cols(i,j):
+                    return False
+                if self.state.board.different_rows(i,j):
+                    return False
+        
+        return True
+
+    
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
