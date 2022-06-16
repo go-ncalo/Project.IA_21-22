@@ -72,13 +72,39 @@ class Board:
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        return (self.get_number(row + 1, col), self.get_number(row - 1, col))
+        values = (self.get_number(row + 1, col) if row<self.size else None, self.get_number(row - 1, col) if row > 0 else None)
+        #print("values:",row," ",col," ", values," ")
+        return values
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        return (self.get_number(row, col - 1), self.get_number(row, col + 1))
+        return (self.get_number(row, col - 1) if col>0 else None, self.get_number(row, col + 1) if col<self.size else None)
 
+    def adjacent_above_numbers(self, row: int, col: int) -> (int, int):
+        """Devolve os 2 valores imediatamente acima."""
+        values = (self.get_number(row - 2, col) if row>1 else None, self.get_number(row - 1, col) if row > 0 else None)
+        return values
+
+    def adjacent_below_numbers(self, row: int, col: int) -> (int, int):
+        """Devolve os 2 valores imediatamente abaixo."""
+        values = (self.get_number(row + 1, col) if row<self.size else None, self.get_number(row + 2, col) if row<self.size-1 else None)
+        return values
+
+    def adjacent_left_numbers(self, row: int, col: int) -> (int, int):
+        """Devolve os 2 valores imediatamente a esquerda."""
+        values = (self.get_number(row, col-2) if col>1 else None, self.get_number(row, col-1) if col>0 else None)
+        return values
+
+    def adjacent_right_numbers(self, row: int, col: int) -> (int, int):
+        """Devolve os 2 valores imediatamente a direita."""
+        values = (self.get_number(row, col+1) if col<self.size else None, self.get_number(row, col+2) if col<self.size-1 else None)
+        return values
+
+    def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
+        """Devolve os valores imediatamente à esquerda e à direita,
+        respectivamente."""
+        return (self.get_number(row, col - 1) if col>0 else None, self.get_number(row, col + 1) if col<self.size else None)
 
 
     def get_row(self, row: int):
@@ -98,12 +124,13 @@ class Board:
         elif (type==COL):
             vector=self.get_col(index)
             
+        #print("Vector: ", vector)
         for i in range(0, self.size):
             if (vector[i]==1):
                 counter_1 += 1
             elif (vector[i]==0):
                 counter_0 += 1
-
+        #print("COUNTER: ",counter_0," ",counter_1)
         return (counter_0,counter_1)
 
 
@@ -118,7 +145,7 @@ class Board:
             vector2=self.get_col(index2)
             
         for i in range(0, self.size):
-            if (vector1[i]!=vector2[i]):
+            if (vector1[i]!=vector2[i] or vector1[i]==2 or vector2[i]==2):
                 return True
 
         return False
@@ -128,6 +155,39 @@ class Board:
 
     def different_rows(self, row1:int, row2:int):
         return self.different_vectors(row1,row2,ROW)
+
+    def valid_board(self):
+        for i in range(0,board.size):
+            for j in range(0,board.size):
+                value=board.get_number(i,j)
+                (v1,v2)=board.adjacent_horizontal_numbers(i,j)
+                if v1==value and v2==value and value!=2:
+                    return False
+                (v1,v2)=board.adjacent_vertical_numbers(i,j)
+                if v1==value and v2==value and value!=2:
+                    return False
+
+        z=0
+        s=board.size
+        if (s%2==1):
+            z=1 
+
+        for i in range(0,board.size):
+            (n0,n1)=board.get_card_vector(i,ROW)
+            if n0>s//2+z or n1>s//2+z:
+                return False
+            (n0,n1)=board.get_card_vector(i,COL)
+            if n0>s//2+z or n1>s//2+z:
+                return False
+            
+        for i in range(0,board.size):
+            for j in range(i+1,board.size):
+                if board.different_cols(i,j)==False:
+                    return False
+                if board.different_rows(i,j)==False:
+                    return False
+        return True
+
 
     def first_void_position(self, index: int, type:int):
         
@@ -151,41 +211,73 @@ class Board:
 
         return True 
     
+    def get_first_void_position(self):
+        for i in range(0,self.size):
+            for j in range(0,self.size):
+                if self.get_number(i,j)==2:
+                    #print(i,j)
+                    return(i,j)
+        return (None,None)
+    
     def get_action(self):
 
-        for i in range(0,self.size) :
-            for j in range (0,self.size):
-                if (self.adjacent_vertical_numbers(i,j)==(0,0)):
-                    return (i,j,1)
-                elif (self.adjacent_horizontal_numbers(i,j)==(1,1)):
-                    return (i,j,0)
+        if (self.valid_board()==False):
+            return []
 
-        for i in range (0, self.size):
-            col=self.get_col(i)
-            row=self.get_row(i)
-            z=0
-            s=self.size
-            if (s%2==1):
-                z=1
-            card_row=self.get_card_vector(i,ROW)
-            card_col=self.get_card_vector(i,COL)
-            if (card_row[0]==s//2+z):
-                j=self.first_void_position(i,ROW)
-                return(i,j,1)
-            if card_row[1]==s//2+z:
-                j=self.first_void_position(i,ROW)
-                return(i,j,0)
-            if card_col[0]==s//2+z:
-                j=self.first_void_position(i,COL)
-                return(j,i,1)
-            if card_col[1]==s//2+z:
-                j=self.first_void_position(i,COL)
-                return(j,i,0)
+        (i,j)=self.get_first_void_position()
 
-            for i in range(0,self.size):
-                j=self.first_void_position(i)
-                if j!=None:
-                    return [(i,j,0),(i,j,1)]
+        if i==None or j==None:
+            return []
+
+        vert_numbers=self.adjacent_vertical_numbers(i,j)
+        horiz_numbers=self.adjacent_horizontal_numbers(i,j)
+        right_numbers=self.adjacent_right_numbers(i,j)
+        left_numbers=self.adjacent_left_numbers(i,j)
+        above_numbers=self.adjacent_above_numbers(i,j)
+        below_numbers=self.adjacent_below_numbers(i,j)
+
+        if (vert_numbers[0]==0 and vert_numbers[1]==0):
+            return [(i,j,1)]
+        elif (vert_numbers[0]==1 and vert_numbers[1]==1):
+            return [(i,j,0)]
+        elif (horiz_numbers[0]==0 and horiz_numbers[1]==0):
+            return [(i,j,1)]
+        elif (horiz_numbers[0]==1 and horiz_numbers[1]==1):
+            return [(i,j,0)]
+        elif (right_numbers[0]==0 and right_numbers[1]==0):
+            return [(i,j,1)]
+        elif (right_numbers[0]==1 and right_numbers[1]==1):
+            return [(i,j,0)]
+        elif (left_numbers[0]==0 and left_numbers[1]==0):
+            return [(i,j,1)]
+        elif (left_numbers[0]==1 and left_numbers[1]==1):
+            return [(i,j,0)]
+        elif (above_numbers[0]==0 and above_numbers[1]==0):
+            return [(i,j,1)]
+        elif (above_numbers[0]==1 and above_numbers[1]==1):
+            return [(i,j,0)]
+        elif (below_numbers[0]==0 and below_numbers[1]==0):
+            return [(i,j,1)]
+        elif (below_numbers[0]==1 and below_numbers[1]==1):
+            return [(i,j,0)]
+
+
+        z=0
+        s=self.size
+        if (s%2==1):
+            z=1
+        card_row=self.get_card_vector(i,ROW)
+        card_col=self.get_card_vector(j,COL)
+        if (card_row[0]==s//2+z):
+            return [(i,j,1)]
+        if card_row[1]==s//2+z:
+            return [(i,j,0)]
+        if card_col[0]==s//2+z:
+            return [(i,j,1)]
+        if card_col[1]==s//2+z:
+            return [(i,j,0)]
+
+        return [(i,j,0),(i,j,1)]
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -216,7 +308,6 @@ class Board:
                 out += '\n'
         return out
 
-    # TODO: outros metodos da classe
 
 
 class Takuzu(Problem):
@@ -227,7 +318,7 @@ class Takuzu(Problem):
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        return [state.board.get_action()]
+        return state.board.get_action()
 
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -240,6 +331,7 @@ class Takuzu(Problem):
         board_copy = state.board.copy()
         new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
+        #print(new_state.board)
         return new_state
         
     def goal_test(self, state: TakuzuState):
@@ -247,35 +339,48 @@ class Takuzu(Problem):
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
         if state.board.all_positions_filled()==False:
+            #print("false1")
             return False
+
+        #print(state.board)
         
         for i in range(0,state.board.size):
             for j in range(0,state.board.size):
                 value=state.board.get_number(i,j)
                 (v1,v2)=state.board.adjacent_horizontal_numbers(i,j)
                 if v1==value and v2==value:
+                    #print("false2")
                     return False
                 (v1,v2)=state.board.adjacent_vertical_numbers(i,j)
                 if v1==value and v2==value:
+                    #print("false3")
                     return False
 
         z=0
-        s=self.size
+        s=state.board.size
         if (s%2==1):
             z=1 
 
         for i in range(0,state.board.size):
             (n0,n1)=state.board.get_card_vector(i,ROW)
             if n0>s//2+z or n1>s//2+z:
+                #print("false4")
+                return False
+            (n0,n1)=state.board.get_card_vector(i,COL)
+            if n0>s//2+z or n1>s//2+z:
+                #print("false4")
                 return False
             
         for i in range(0,state.board.size):
-            for j in range(i,state.board.size):
-                if state.board.different_cols(i,j):
+            for j in range(i+1,state.board.size):
+                if state.board.different_cols(i,j)==False:
+                    #print("false5")
                     return False
-                if state.board.different_rows(i,j):
+                if state.board.different_rows(i,j)==False:
+                    #print("false6")
                     return False
         
+        #print("true")
         return True
 
     
@@ -293,9 +398,8 @@ if __name__ == "__main__":
     board = Board.parse_instance_from_stdin()
     problem = Takuzu(board)
     goal_node = depth_first_tree_search(problem)
-    print(board)
+    print(goal_node.state.board)
     # Ler o ficheiro do standard input,
     # Usar uma técnica de procura para resolver a instância,
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
-    pass
