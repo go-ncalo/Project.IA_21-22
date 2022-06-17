@@ -165,7 +165,6 @@ class Board:
                 (v1,v2)=self.adjacent_vertical_numbers(i,j)
                 if v1==value and v2==value and value!=2:
                     return False
-
         z=0
         s=self.size
         if (s%2==1):
@@ -224,60 +223,60 @@ class Board:
         if (self.valid_board()==False):
             return []
 
-        (i,j)=self.get_first_void_position()
+        for i in range(0,self.size) :
+            for j in range (0,self.size):
+                if (self.get_number(i,j)==2):
+                    if (self.adjacent_vertical_numbers(i,j)[0]==0 and self.adjacent_vertical_numbers(i,j)[1]==0):
+                        #print("PAR (0,0): ", (i,j))
+                        return [(i,j,1)]
+                    elif (self.adjacent_vertical_numbers(i,j)[0]==1 and self.adjacent_vertical_numbers(i,j)[1]==1):
+                        #print("here2\n")
+                        #print(self.get_number(i,j))
+                        return [(i,j,0)]
+                    elif (self.adjacent_horizontal_numbers(i,j)[0]==0 and self.adjacent_horizontal_numbers(i,j)[1]==0):
+                        #print("PAR (0,0): ", (i,j))
+                        return [(i,j,1)]
+                    elif (self.adjacent_horizontal_numbers(i,j)[0]==1 and self.adjacent_horizontal_numbers(i,j)[1]==1):
+                        #print("here2\n")
+                        return [(i,j,0)]
 
-        if i==None or j==None:
-            return []
+        for i in range (0, self.size):
+            z=0
+            s=self.size
+            if (s%2==1):
+                z=1
+            card_row=self.get_card_vector(i,ROW)
+            card_col=self.get_card_vector(i,COL)
+            #print("Card row: ",card_row)
+            #print("Card col: ",card_col)
+            if (card_row[0]==s//2+z):
+                #print("here3\n")
+                j=self.first_void_position(i,ROW)
+                if j!=None and self.get_number(i,j)==2:
+                    return [(i,j,1)]
+            if card_row[1]==s//2+z:
+                #print("here4\n")
+                j=self.first_void_position(i,ROW)
+                if j!=None and self.get_number(i,j)==2:
+                    return [(i,j,0)]
+            if card_col[0]==s//2+z:
+                #print("here5\n")
+                j=self.first_void_position(i,COL)
+                if j!=None and self.get_number(i,j)==2:
+                    return [(j,i,1)]
+            if card_col[1]==s//2+z:
+                #print("here6\n")
+                j=self.first_void_position(i,COL)
+                if j!=None and self.get_number(i,j)==2:
+                    return [(j,i,0)]
 
-        vert_numbers=self.adjacent_vertical_numbers(i,j)
-        horiz_numbers=self.adjacent_horizontal_numbers(i,j)
-        right_numbers=self.adjacent_right_numbers(i,j)
-        left_numbers=self.adjacent_left_numbers(i,j)
-        above_numbers=self.adjacent_above_numbers(i,j)
-        below_numbers=self.adjacent_below_numbers(i,j)
+        for i in range(0,self.size):
+            j=self.first_void_position(i,ROW)
+            if j!=None and self.get_number(i,j)==2:
+                return [(i,j,0),(i,j,1)]
 
-        if (vert_numbers[0]==0 and vert_numbers[1]==0):
-            return [(i,j,1)]
-        elif (vert_numbers[0]==1 and vert_numbers[1]==1):
-            return [(i,j,0)]
-        elif (horiz_numbers[0]==0 and horiz_numbers[1]==0):
-            return [(i,j,1)]
-        elif (horiz_numbers[0]==1 and horiz_numbers[1]==1):
-            return [(i,j,0)]
-        elif (right_numbers[0]==0 and right_numbers[1]==0):
-            return [(i,j,1)]
-        elif (right_numbers[0]==1 and right_numbers[1]==1):
-            return [(i,j,0)]
-        elif (left_numbers[0]==0 and left_numbers[1]==0):
-            return [(i,j,1)]
-        elif (left_numbers[0]==1 and left_numbers[1]==1):
-            return [(i,j,0)]
-        elif (above_numbers[0]==0 and above_numbers[1]==0):
-            return [(i,j,1)]
-        elif (above_numbers[0]==1 and above_numbers[1]==1):
-            return [(i,j,0)]
-        elif (below_numbers[0]==0 and below_numbers[1]==0):
-            return [(i,j,1)]
-        elif (below_numbers[0]==1 and below_numbers[1]==1):
-            return [(i,j,0)]
+        return []
 
-
-        z=0
-        s=self.size
-        if (s%2==1):
-            z=1
-        card_row=self.get_card_vector(i,ROW)
-        card_col=self.get_card_vector(j,COL)
-        if (card_row[0]==s//2+z):
-            return [(i,j,1)]
-        if card_row[1]==s//2+z:
-            return [(i,j,0)]
-        if card_col[0]==s//2+z:
-            return [(i,j,1)]
-        if card_col[1]==s//2+z:
-            return [(i,j,0)]
-
-        return [(i,j,0),(i,j,1)]
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -329,6 +328,7 @@ class Takuzu(Problem):
         i=action[0]
         j=action[1]
         value=action[2]
+        #print(action)
         board_copy = state.board.copy()
         new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
