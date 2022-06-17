@@ -42,7 +42,6 @@ class Board:
         """Representação interna de um tabuleiro de Takuzu."""
         self.board = board
         self.size = size
-        pass
     
     # FUNÇÃO DO GONÇALO
     def copy(self):
@@ -157,34 +156,34 @@ class Board:
         return self.different_vectors(row1,row2,ROW)
 
     def valid_board(self):
-        for i in range(0,board.size):
-            for j in range(0,board.size):
-                value=board.get_number(i,j)
-                (v1,v2)=board.adjacent_horizontal_numbers(i,j)
+        for i in range(0,self.size):
+            for j in range(0,self.size):
+                value=self.get_number(i,j)
+                (v1,v2)=self.adjacent_horizontal_numbers(i,j)
                 if v1==value and v2==value and value!=2:
                     return False
-                (v1,v2)=board.adjacent_vertical_numbers(i,j)
+                (v1,v2)=self.adjacent_vertical_numbers(i,j)
                 if v1==value and v2==value and value!=2:
                     return False
 
         z=0
-        s=board.size
+        s=self.size
         if (s%2==1):
             z=1 
 
-        for i in range(0,board.size):
-            (n0,n1)=board.get_card_vector(i,ROW)
+        for i in range(0,self.size):
+            (n0,n1)=self.get_card_vector(i,ROW)
             if n0>s//2+z or n1>s//2+z:
                 return False
-            (n0,n1)=board.get_card_vector(i,COL)
+            (n0,n1)=self.get_card_vector(i,COL)
             if n0>s//2+z or n1>s//2+z:
                 return False
             
-        for i in range(0,board.size):
-            for j in range(i+1,board.size):
-                if board.different_cols(i,j)==False:
+        for i in range(0,self.size):
+            for j in range(i+1,self.size):
+                if self.different_cols(i,j)==False:
                     return False
-                if board.different_rows(i,j)==False:
+                if self.different_rows(i,j)==False:
                     return False
         return True
 
@@ -220,6 +219,7 @@ class Board:
         return (None,None)
     
     def get_action(self):
+
 
         if (self.valid_board()==False):
             return []
@@ -314,6 +314,7 @@ class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         self.initial=TakuzuState(board)
+        self.counter=0
 
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
@@ -331,18 +332,17 @@ class Takuzu(Problem):
         board_copy = state.board.copy()
         new_state=TakuzuState(board_copy)
         new_state.board.change_value(i,j,value)
-        #print(new_state.board)
         return new_state
         
     def goal_test(self, state: TakuzuState):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
+
         if state.board.all_positions_filled()==False:
             #print("false1")
             return False
 
-        #print(state.board)
         
         for i in range(0,state.board.size):
             for j in range(0,state.board.size):
@@ -354,6 +354,7 @@ class Takuzu(Problem):
                 (v1,v2)=state.board.adjacent_vertical_numbers(i,j)
                 if v1==value and v2==value:
                     #print("false3")
+                    #print(i,j)
                     return False
 
         z=0
