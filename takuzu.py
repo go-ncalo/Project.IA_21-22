@@ -227,18 +227,30 @@ class Board:
             for j in range (0,self.size):
                 if (self.get_number(i,j)==2):
                     if (self.adjacent_vertical_numbers(i,j)[0]==0 and self.adjacent_vertical_numbers(i,j)[1]==0):
-                        #print("PAR (0,0): ", (i,j))
                         return [(i,j,1)]
                     elif (self.adjacent_vertical_numbers(i,j)[0]==1 and self.adjacent_vertical_numbers(i,j)[1]==1):
-                        #print("here2\n")
-                        #print(self.get_number(i,j))
                         return [(i,j,0)]
                     elif (self.adjacent_horizontal_numbers(i,j)[0]==0 and self.adjacent_horizontal_numbers(i,j)[1]==0):
-                        #print("PAR (0,0): ", (i,j))
                         return [(i,j,1)]
                     elif (self.adjacent_horizontal_numbers(i,j)[0]==1 and self.adjacent_horizontal_numbers(i,j)[1]==1):
-                        #print("here2\n")
                         return [(i,j,0)]
+                    elif (self.adjacent_above_numbers(i,j)[0]==0 and self.adjacent_above_numbers(i,j)[1]==0):
+                        return [(i,j,1)]
+                    elif (self.adjacent_above_numbers(i,j)[0]==1 and self.adjacent_above_numbers(i,j)[1]==1):
+                        return [(i,j,0)]
+                    elif (self.adjacent_below_numbers(i,j)[0]==0 and self.adjacent_below_numbers(i,j)[1]==0):
+                        return [(i,j,1)]
+                    elif (self.adjacent_below_numbers(i,j)[0]==1 and self.adjacent_below_numbers(i,j)[1]==1):
+                        return [(i,j,0)]
+                    elif (self.adjacent_left_numbers(i,j)[0]==0 and self.adjacent_left_numbers(i,j)[1]==0):
+                        return [(i,j,1)]
+                    elif (self.adjacent_left_numbers(i,j)[0]==1 and self.adjacent_left_numbers(i,j)[1]==1):
+                        return [(i,j,0)]
+                    elif (self.adjacent_right_numbers(i,j)[0]==0 and self.adjacent_right_numbers(i,j)[1]==0):
+                        return [(i,j,1)]
+                    elif (self.adjacent_right_numbers(i,j)[0]==1 and self.adjacent_right_numbers(i,j)[1]==1):
+                        return [(i,j,0)]
+                    
 
         for i in range (0, self.size):
             z=0
